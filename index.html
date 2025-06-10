@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NovaCar - Detalles de Vehículos</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .thumbnail { cursor: pointer; transition: transform .2s ease; }
+    .thumbnail.active { ring: 2px solid #7c3aed; }
+    .thumbnail:hover { transform: scale(1.05); }
+    .vehicle-card { transition: opacity .3s ease, transform .3s ease; }
+    .vehicle-card.hidden { opacity: 0; transform: scale(.9); pointer-events: none; }
+    .modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-width: 90%; max-height: 90%; overflow-y: auto; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- HEADER -->
+  <header class="flex justify-between items-center p-6 border-b">
+    <div class="flex items-center space-x-2">
+      <img src="img/Logonovacar.png" alt="NovaCar Logo" class="h-1" /><span class="font-bold">Novacar</span>
+    </div>
+    <div class="flex items-center space-x-2 text-purple-600">
+      <img src="icons/Icon+bg.png" alt="Phone" class="h-6" /><span>+57 310 000 0000</span>
+    </div>
+  </header>
+
+  <!-- TITULO Y FILTROS -->
+  <section class="text-center py-10">
+    <h1 class="text-3xl font-bold mb-6">¿Cuál carrito te vas a llevar pues?</h1>
+    <div class="flex justify-center flex-wrap gap-2" id="filter-buttons">
+      <button class="filter-btn bg-purple-600 text-white px-4 py-1 rounded-full" data-category="all">All vehicles</button>
+      <button class="filter-btn border px-4 py-1 rounded-full" data-category="sedan">Sedan</button>
+      <button class="filter-btn border px-4 py-1 rounded-full" data-category="cabriolet">Cabriolet</button>
+      <button class="filter-btn border px-4 py-1 rounded-full" data-category="pickup">Pickup</button>
+      <button class="filter-btn border px-4 py-1 rounded-full" data-category="suv">SUV</button>
+      <button class="filter-btn border px-4 py-1 rounded-full" data-category="minivan">Minivan</button>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto p-6">
+    <div class="mb-6">
+      <button onclick="showVehicleList()" class="flex items-center space-x-2 text-purple-600 hover:text-purple-700">&larr; Volver a la lista</button>
+    </div>
+    <div id="main-content"></div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="vehicleModal" class="modal" onclick="if(event.target.id==='vehicleModal') closeModal()">
+    <div class="modal-content p-6 w-full max-w-4xl">
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="modalTitle" class="text-2xl font-bold"></h2>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white text-black px-6 pt-10 pb-6 text-base border-t">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+      
+      <!-- Columna 1: Información general -->
+      <div>
+        <h3 class="font-bold">NovaCar - Compra y venta de vehículos</h3>
+        <p class="mt-2">Conseguí tu nave sin vueltas ni enredos.</p>
+        <div class="flex space-x-4 mt-4">
+          <a href="#"><img src="icons/fb.png" alt="Facebook" class="w-5 h-5"></a>
+          <a href="#"><img src="icons/ig2.png" alt="Instagram" class="w-5 h-5"></a>
+          <a href="#"><img src="icons/x2.png" alt="Twitter/X" class="w-5 h-5"></a>
+          <a href="#"><img src="icons/yt.png" alt="YouTube" class="w-5 h-5"></a>
+        </div>
+      </div>
+
+      <!-- Columna 2: Categorías de vehículos -->
+      <div>
+        <h4 class="font-bold mb-2">Vehículos</h4>
+        <ul class="space-y-1">
+          <li><a href="#" class="text-gray-600 hover:text-purple-600">Sedan</a></li>
+          <li><a href="#" class="text-gray-600 hover:text-purple-600">Cabriolet</a></li>
+          <li><a href="#" class="text-gray-600 hover:text-purple-600">Pickup</a></li>
+          <li><a href="#" class="text-gray-600 hover:text-purple-600">Minivan</a></li>
+          <li><a href="#" class="text-gray-600 hover:text-purple-600">SUV</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Contacto -->
+      <div>
+        <h4 class="font-bold mb-2">Dirección</h4>
+        <p>Cra. 43A #1 Sur-188, Medellín, Antioquia</p>
+
+        <h4 class="font-bold mt-4 mb-1">Email</h4>
+        <p>contacto@novacar.com.co</p>
+
+        <h4 class="font-bold mt-4 mb-1">Teléfono</h4>
+        <p>+57 310 456 7890</p>
+      </div>
+
+      <!-- Columna 4: App -->
+      <div>
+        <h4 class="font-bold mb-2">Descarga nuestra app</h4>
+        <div class="space-y-2 mt-2">
+          <a href="#"><img src="icons/App Store.png" alt="App Store" class="h-10"></a>
+          <a href="#"><img src="icons/Google Play.png" alt="Google Play" class="h-10"></a>
+        </div>
+      </div>
+
+    </div>
+
+   <div class="mt-10 text-center text-base text-gray-600">
+  © Copyright NovaCar 2025. Página diseñada por Miguel Ángel González Zuluaga.
+  <br />
+  CEO Miguel Ángel González Zuluaga - Ingeniero
+  <br />
+  CEO Dylan Gómez - Ingeniero
+</div>
+
+
+  </footer>
+
+  <script>
+    const vehiclesData = {
+      'toyota-sequoia': { name:'Toyota Sequoia', category:'suv', price:'$510.000.000', year:'2023', images:['img/4.png','img/interior-1.png'], specs:{transmission:'Automático',fuel:'Diésel',doors:'4',airCondition:true,seats:'7',mileage:'5000'}, equipment:['ABS','Air Bags','Cruise Control','GPS Navigation'] },
+      'kia-sportage': { name:'Kia Sportage', category:'suv', price:'$62.500.000', year:'2016', images:['img/2.png','img/2-interior.png'], specs:{transmission:'Manual',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'85000'}, equipment:['ABS','Air Bags','Air Conditioner','Power Steering'] },
+      'kia-picanto': { name:'Kia Picanto', category:'sedan', price:'$62.000.000', year:'2026', images:['img/9.png','img/9-interior.png'], specs:{transmission:'Automático',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'0'}, equipment:['ABS','Air Bags','Bluetooth','USB Port'] },
+      'renault': { name:'Renault', category:'minivan', price:'$53.000.000', year:'2023', images:['img/6.png','img/6-interior.png'], specs:{transmission:'Automático',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'15000'}, equipment:['ABS','Air Bags','Parking Sensors'] },
+      'bmw-x6': { name:'BMW X6', category:'cabriolet', price:'$555.000.000', year:'2023', images:['img/7.png','img/7-interior.png'], specs:{transmission:'Automático',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'8000'}, equipment:['Leather Seats','Sunroof','Premium Sound'] },
+      'mazda-3': { name:'Mazda 3', category:'sedan', price:'$73.000.000', year:'2020', images:['img/5.png','img/5-interior.png'], specs:{transmission:'Manual',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'45000'}, equipment:['Bluetooth','USB Port','Alloy Wheels'] },
+      'chevrolet': { name:'Chevrolet', category:'pickup', price:'$136.900.000', year:'2021', images:['img/8.png','img/8-interior.png'], specs:{transmission:'Manual',fuel:'PB 95',doors:'4',airCondition:true,seats:'5',mileage:'32000'}, equipment:['Power Steering','Central Locking','Electric Windows'] }
+    };
+
+    function showVehicleList() {
+      let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-6">';
+      for(let key in vehiclesData){
+        const v = vehiclesData[key];
+        html += `
+          <div class="vehicle-card bg-white rounded-xl shadow-sm" data-category="${v.category}">
+            <img src="${v.images[0]}" alt="${v.name}" class="w-full h-48 object-cover"/>
+            <div class="p-4">
+              <h3 class="font-bold text-lg">${v.name}</h3>
+              <p class="text-blue-600 font-semibold">${v.price}</p>
+              <p class="text-gray-500 text-sm">${v.year}</p>
+              <div class="flex space-x-2 mt-4">
+                <button onclick="showVehicleDetails('${key}')" class="flex-1 bg-purple-600 text-white py-2 rounded-lg">Más detalles</button>
+                <button onclick="openModal('${key}')" class="px-4 py-2 border border-purple-600 text-purple-600 rounded-lg">Vista rápida</button>
+              </div>
+            </div>
+          </div>`;
+      }
+      html += '</div>';
+      document.getElementById('main-content').innerHTML = html;
+    }
+
+    function showVehicleDetails(k){
+      const v = vehiclesData[k];
+      let imagesHTML = `<div><img id="main-image" src="${v.images[0]}" class="w-full h-80 object-cover rounded-lg"/></div><div class="flex space-x-3 mt-2">`;
+      v.images.forEach((img, i) => {
+        imagesHTML += `<img src="${img}" onclick="changeImage('${img}', this)" class="thumbnail ${i===0?'active':''} w-20 h-20 object-cover rounded-lg"/>`;
+      });
+      imagesHTML += "</div>";
+
+      let specsHTML = Object.entries(v.specs).map(([k, val]) =>
+        `<div class="text-center"><div>${getIcon(k)}</div><div>${capitalize(k)}: <strong>${val}</strong></div></div>`
+      ).join("");
+
+      let equipHTML = v.equipment.map(e => `<div>✓ ${e}</div>`).join("");
+
+      document.getElementById('main-content').innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>${imagesHTML}</div>
+          <div>
+            <h1 class="text-3xl font-bold">${v.name}</h1>
+            <p class="text-blue-600 text-2xl mb-2">${v.price}</p>
+            <p class="text-gray-500 mb-4">Año: ${v.year}</p>
+            <div class="grid grid-cols-3 gap-4 mb-4">${specsHTML}</div>
+            <button onclick="contactOwner('${v.name}')" class="w-full bg-purple-600 text-white py-3 rounded-lg mb-4">Contactar al dueño</button>
+            <div><h3 class="font-semibold mb-2">Equipamiento</h3>${equipHTML}</div>
+          </div>
+        </div>`;
+    }
+
+    function openModal(k){
+      const v = vehiclesData[k];
+      document.getElementById('modalTitle').textContent = v.name;
+      document.getElementById('modalContent').innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <img src="${v.images[0]}" class="w-full h-64 object-contain rounded-lg"/>
+          <div>
+            <p class="font-semibold text-lg">${v.price}</p>
+            <p class="text-gray-600 mb-2">Año: ${v.year}</p>
+            <ul class="list-disc list-inside">${v.equipment.map(eq=>`<li>${eq}</li>`).join("")}</ul>
+            <div class="mt-4 flex space-x-2">
+              <button onclick="closeModal(); showVehicleDetails('${k}')" class="flex-1 bg-purple-600 text-white py-2 rounded-lg">Ver detalles</button>
+              <button onclick="contactOwner('${v.name}')" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Contactar</button>
+            </div>
+          </div>
+        </div>`;
+      document.getElementById('vehicleModal').classList.add('active');
+    }
+
+    function closeModal(){
+      document.getElementById('vehicleModal').classList.remove('active');
+    }
+
+    function changeImage(src, el){
+      document.getElementById('main-image').src = src;
+      document.querySelectorAll('.thumbnail').forEach(t=>t.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function contactOwner(name){
+      const msg = `¡Hola! Estoy interesado en el ${name}. ¿Podrías darme más info?`;
+      window.open(`https://wa.me/573100000000?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function getIcon(key){
+      const icons = {transmission:'🔧', fuel:'⛽', doors:'🚪', airCondition:'❄️', seats:'🪑', mileage:'🏃'};
+      return `<div class="spec-icon mx-auto">${icons[key]}</div>`;
+    }
+    function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    document.getElementById('filter-buttons').addEventListener('click', e => {
+      if(!e.target.matches('.filter-btn')) return;
+      const cat = e.target.getAttribute('data-category');
+      document.querySelectorAll('.vehicle-card').forEach(card => {
+        card.classList.toggle('hidden', cat !== 'all' && card.dataset.category !== cat);
+      });
+    }); // filtro funcionando :contentReference[oaicite:5]{index=5}
+
+    window.onload = showVehicleList;
+  </script>
+</body>
+</html>
